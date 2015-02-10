@@ -1,6 +1,8 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update]
-  before_action :require_same_user, only: [:edit, :update]
+  before_action only: [:edit, :update] do
+    require_same_user(@user)
+  end
 
   def show
   end
@@ -41,12 +43,5 @@ class UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
-  end
-
-  def require_same_user
-    unless @user == current_user
-      flash[:error] = 'You cannot edit another user'
-      redirect_to root_path
-    end
   end
 end
