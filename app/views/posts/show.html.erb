@@ -22,5 +22,5 @@
 
 <h5><%= 'Comments:' if @comments.any? %></h5>
 <% @comments.each do |comment| %>
-  <%= render 'comment', comment: comment %>
+  <%= render 'posts/comment', comment: comment %>
 <% end %>
