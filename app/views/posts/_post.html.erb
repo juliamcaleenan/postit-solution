@@ -1,15 +1,20 @@
+<div class='row' id="post_<%= post.slug %>_votes_error" style="display: none">
+  <div class='alert alert-error span3 text-center'>
+    You can only vote once on a post
+  </div>
+</div>
 <div class='row'>
   <div class='span1 well text-center'>
     <% if logged_in? %>
-      <%= link_to vote_post_path(post, vote: true), method: 'post' do %>
+      <%= link_to vote_post_path(post, vote: true), method: 'post', remote: true do %>
         <i class='icon-arrow-up'></i>
       <% end %>
       <br/>
     <% end %>
-    <%= pluralize(post.total_votes, 'vote') %>
+    <span id="post_<%= post.slug %>_votes"><%= pluralize(post.total_votes, 'vote') %></span>
     <br/>
     <% if logged_in? %>
-      <%= link_to vote_post_path(post, vote: false), method: 'post' do %>
+      <%= link_to vote_post_path(post, vote: false), method: 'post', remote: true do %>
         <i class='icon-arrow-down'></i>
       <% end %>
     <% end %>
@@ -17,12 +22,13 @@
   <div class='span8 well'>
     <%= render post.categories %>
     <p class='pull-right'>
-      <% if logged_in? && same_user?(post.creator) %>
+      <% if logged_in? && ( same_user?(post.creator) || current_user.admin? ) %>
         [<%= link_to 'edit post', edit_post_path(post) %>]
       <% end %>
     </p>
-    <h4><%= link_to post.title,  fix_url(post.url) %></h4>
+    <h4><%= link_to post.title,  post_path(post) %></h4>
     <p><%= post.description %></p>
+    <p><%= link_to 'View site', fix_url(post.url) %></p>
     <p>
       <span class='quiet'>posted by</span> <%= link_to post.creator.username, user_path(post.creator) %>
       <small>at <%= format_date_time(post.created_at) %></small>

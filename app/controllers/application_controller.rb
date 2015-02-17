@@ -25,9 +25,19 @@ class ApplicationController < ActionController::Base
   end
 
   def require_same_user(user)
-    unless user == current_user
-      flash[:error] = 'You do not have permission to perform that action'
-      redirect_to root_path
-    end
+    access_denied unless logged_in? and same_user?(user)
+  end
+
+  def require_admin
+    access_denied unless logged_in? and current_user.admin?
+  end
+
+  def require_same_user_or_admin(user)
+    access_denied unless logged_in? and ( same_user?(user) or current_user.admin? )
+  end
+
+  def access_denied
+    flash[:error] = 'You do not have permission to perform that action'
+    redirect_to root_path
   end
 end

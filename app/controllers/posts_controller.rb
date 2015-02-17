@@ -2,7 +2,7 @@ class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :vote]
   before_action :require_user, except: [:index, :show]
   before_action only: [:edit, :update] do
-    require_same_user(@post.creator)
+    require_same_user_or_admin(@post.creator)
   end
 
   def index
@@ -12,6 +12,12 @@ class PostsController < ApplicationController
   def show
     @comments = @post.comments.all
     @comment = Comment.new
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @post }
+      format.xml { render xml: @post }
+    end
   end
 
   def new
@@ -45,12 +51,17 @@ class PostsController < ApplicationController
   def vote
     @vote = Vote.create(vote: params[:vote], voteable: @post, creator: current_user)
 
-    if @vote.valid?
-      flash[:notice] = "Your vote was counted"
-    else
-      flash[:error] = "You can only vote once on a post"
+    respond_to do |format|
+      format.html do
+        if @vote.valid?
+          flash[:notice] = "Your vote was counted"
+        else
+          flash[:error] = "You can only vote once on a post"
+        end
+        redirect_to :back
+      end
+      format.js
     end
-    redirect_to :back
   end
 
   private
@@ -60,6 +71,6 @@ class PostsController < ApplicationController
   end
 
   def set_post
-    @post = Post.find(params[:id])
+    @post = Post.find_by(slug: params[:id])
   end
 end

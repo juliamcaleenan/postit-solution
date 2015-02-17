@@ -1,4 +1,4 @@
-<% if logged_in? && same_user?(@post.creator) %>
+<% if logged_in? && ( same_user?(@post.creator) || current_user.admin? ) %>
   <p class='pull-right'>[<%= link_to 'edit post', edit_post_path(@post) %>]</p>
 <% end %>
 
@@ -6,7 +6,9 @@
 
 <%= render 'shared/content_title', title: @post.title %>
 
-<p><%= @post.description %><hr/></p>
+<p><%= @post.description %></p>
+<p><%= link_to 'View site', fix_url(@post.url) %></p>
+<hr/>
 
 <% if logged_in? %>
   <%= render 'shared/errors', obj: @comment %>
